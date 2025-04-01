@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/layout_head') %>
+    <title><%= title %></title>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <div class="container mt-4">
+        <h1 class="mb-4">Our Products</h1>
+        <div class="row">
+            <% for(let i=1; i<=6; i++) { %>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Product <%= i %></h5>
+                        <p class="card-text">$<%= (19.99 + i).toFixed(2) %></p>
+                        <button class="btn btn-primary add-to-cart" data-id="<%= i %>">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+        </div>
+    </div>
+    <%- include('partials/layout_footer') %>
+</body>
+</html>

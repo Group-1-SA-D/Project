@@ -1,0 +1,27 @@
+{
+  "name": "prototype",
+  "version": "1.0.0",
+  "description": "The prototype for the eCommerce frontend.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://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@github.com/Group-1-SA-D/Prototype.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Group-1-SA-D/Prototype/issues"
+  },
+  "homepage": "https://github.com/Group-1-SA-D/Prototype#readme",
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.3",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  }
+}
