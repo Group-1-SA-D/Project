@@ -4,6 +4,7 @@ const app = express();
 
 // Set up static files and views
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/media/img', express.static(path.join(__dirname, 'media/img'))); // Add this line
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
