@@ -24,15 +24,6 @@
     <div class="container mt-4">
         <h1 class="mb-4">Our Products</h1>
         <div class="row">
-            <% const products = [
-                { id: 1, name: "Classic T-Shirt", price: 18.99, category: "Apparel", image: "tshirt.png" },
-                { id: 2, name: "Hoodie", price: 34.99, category: "Apparel", image: "hoodie.png" },
-                { id: 3, name: "Baseball Cap", price: 19.99, category: "Apparel", image: "cap.png" },
-                { id: 4, name: "Trading Card Booster", price: 4.99, category: "Merchandise", image: "cards.png" },
-                { id: 5, name: "Premium Mug", price: 14.99, category: "Merchandise", image: "mug.png" },
-                { id: 6, name: "Socks", price: 11.99, category: "Apparel", image: "socks.png" }
-            ]; %>
-            
             <% products.forEach(product => { %>
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
@@ -55,5 +46,45 @@
         </div>
     </div>
     <%- include('partials/layout_footer') %>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.id;
+                try {
+                    const response = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        updateCartCount(result.count);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+
+        // Update cart count on page load
+        updateCartCount();
+        
+        async function updateCartCount() {
+            try {
+                const response = await fetch('/api/cart/count');
+                const data = await response.json();
+                document.querySelectorAll('.cart-badge').forEach(badge => {
+                    badge.textContent = data.count;
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+    });
+    </script>
 </body>
 </html>

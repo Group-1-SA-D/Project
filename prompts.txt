@@ -2,11 +2,35 @@ OpenHands:
 
 Create a basic ExpressJS eCommerce template, and add a landing page and shopping cart.
 
-Flux:
+Flux Schnell:
 
 Professional product photo of a [insert item] on a white background, red and white, FSU text, product photo, DSLR photography
 
 Void/DeepSeek:
 
 Add placeholder product info for a university merch store.
+
+Add a customer service page.
+
+Add a special offers page.
+
+Add sets of images to the bundles on the offers page.
+
+Add demo functionality so that items can be added to the cart. This will eventually be integrated into a database, but this is just demo functionality for now.
+
+ReferenceError: products is not defined
+    at C:\Users\Evan\Documents\Prototype\index.js:34:21
+    at Layer.handleRequest (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\layer.js:152:17)
+    at next (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\route.js:157:13)
+    at Route.dispatch (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\route.js:117:3)
+    at handle (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:435:11)
+    at Layer.handleRequest (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\layer.js:152:17)
+    at C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:295:15
+    at processParams (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:582:12)
+    at next (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:291:5)
+    at C:\Users\Evan\Documents\Prototype\index.js:28:5
+
+I got this error when I tried to add something to the cart.
+
+Make it so that you can remove items from the cart.
 
