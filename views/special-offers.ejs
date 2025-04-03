@@ -52,7 +52,7 @@
                     name: "Limited Edition Hoodie", 
                     price: 29.99, 
                     originalPrice: 49.99, 
-                    image: ["hoodie.png"], 
+                    image: ["Hoodie.png"], 
                     tag: "25% OFF",
                     type: "single"
                 },
@@ -130,5 +130,31 @@
         </div>
     </div>
     <%- include('partials/layout_footer') %>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add to cart functionality
+        document.querySelectorAll('.add-to-cart').forEach(button => {
+            button.addEventListener('click', async function() {
+                const productId = this.dataset.id;
+                try {
+                    const response = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ productId })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        alert('Item added to cart!');
+                        updateCartCount(result.count);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+        });
+    });
+    </script>
 </body>
 </html>

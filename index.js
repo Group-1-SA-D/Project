@@ -31,10 +31,14 @@ app.use((req, res, next) => {
 // API endpoint to add to cart
 app.post('/api/cart/add', (req, res) => {
     const { productId } = req.body;
-    const product = products.find(p => p.id == productId);
+    const product = products.find(p => p.id == productId) || specialOffers.find(p => p.id == productId);
     if (product) {
         req.session.cart.push(product);
-        res.json({ success: true, count: req.session.cart.length });
+        res.json({ 
+            success: true, 
+            count: req.session.cart.length,
+            total: req.session.cart.reduce((sum, item) => sum + item.price, 0)
+        });
     } else {
         res.json({ success: false });
     }
@@ -69,11 +73,18 @@ app.get('/', (req, res) => {
 // Define products array
 const products = [
     { id: 1, name: "Classic T-Shirt", price: 18.99, category: "Apparel", image: "tshirt.png" },
-    { id: 2, name: "Hoodie", price: 34.99, category: "Apparel", image: "hoodie.png" },
+    { id: 2, name: "Hoodie", price: 34.99, category: "Apparel", image: "Hoodie.png" },
     { id: 3, name: "Baseball Cap", price: 19.99, category: "Apparel", image: "cap.png" },
     { id: 4, name: "Trading Card Booster", price: 4.99, category: "Merchandise", image: "cards.png" },
-    { id: 5, name: "Premium Mug", price: 14.99, category: "Merchandise", image: "mug.png" },
-    { id: 6, name: "Socks", price: 11.99, category: "Apparel", image: "socks.png" }
+    { id: 5, name: "Premium Mug", price: 14.99, category: "Merchandise", image: "Mug.png" },
+    { id: 6, name: "Socks", price: 11.99, category: "Apparel", image: "Socks.png" }
+];
+
+// Define special offers array
+const specialOffers = [
+    { id: 7, name: "Limited Edition Hoodie", price: 29.99, category: "Apparel", image: "Hoodie.png" },
+    { id: 8, name: "Bundle: T-Shirt + Cap", price: 34.99, category: "Bundle", image: ["tshirt.png", "cap.png"] },
+    { id: 9, name: "Back to School Pack", price: 49.99, category: "Bundle", image: ["tshirt.png", "cap.png", "socks.png"] }
 ];
 
 // Update products route to pass the products array
