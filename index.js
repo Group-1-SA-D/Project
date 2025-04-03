@@ -21,6 +21,14 @@ app.get('/cart', (req, res) => {
   res.render('cart', { title: 'Your Cart' });
 });
 
+app.get('/customer-service', (req, res) => {
+  res.render('customer-service', { title: 'Customer Service' });
+});
+
+app.get('/special-offers', (req, res) => {
+  res.render('special-offers', { title: 'Special Offers' });
+});
+
 // Start server
 const PORT = process.env.PORT || 53400;
 app.listen(PORT, '0.0.0.0', () => {

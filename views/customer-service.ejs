@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/layout_head') %>
+    <title>Customer Service - Frostburg State Store</title>
+    <style>
+        .service-card {
+            border-left: 4px solid #dc3545;
+        }
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <div class="container mt-4">
+        <h1 class="mb-4" style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 10px;">
+            Customer Service
+        </h1>
+        
+        <div class="row mb-5">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 service-card">
+                    <div class="card-body">
+                        <h3><i class="bi bi-headset me-2"></i> Contact Us</h3>
+                        <p class="card-text">
+                            <strong>Phone:</strong> (301) 687-4000<br>
+                            <strong>Email:</strong> support@frostburgstatestore.edu<br>
+                            <strong>Hours:</strong> Mon-Fri 9am-5pm EST
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card h-100 service-card">
+                    <div class="card-body">
+                        <h3><i class="bi bi-question-circle me-2"></i> FAQ</h3>
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                        What's your return policy?
+                                    </button>
+                                </h2>
+                                <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        We accept returns within 30 days with original receipt.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                        How long does shipping take?
+                                    </button>
+                                </h2>
+                                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        Most orders ship within 2-3 business days.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card contact-form">
+            <div class="card-body">
+                <h3 class="mb-4">Send us a message</h3>
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Message</label>
+                        <textarea class="form-control" rows="5" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <%- include('partials/layout_footer') %>
+</body>
+</html>

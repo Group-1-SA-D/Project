@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/layout_head') %>
+    <title>Special Offers - Frostburg State Store</title>
+    <style>
+        .offer-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .card {
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            height: 100%;
+        }
+        .bundle-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: white;
+            padding: 5px;
+        }
+        .bundle-main-image {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/navbar') %>
+    <div class="container mt-4">
+        <h1 class="mb-4" style="color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 10px;">
+            Special Offers
+        </h1>
+        
+        <div class="row">
+            <% const offers = [
+                { 
+                    id: 7, 
+                    name: "Limited Edition Hoodie", 
+                    price: 29.99, 
+                    originalPrice: 49.99, 
+                    image: ["hoodie.png"], 
+                    tag: "25% OFF",
+                    type: "single"
+                },
+                { 
+                    id: 8, 
+                    name: "Bundle: T-Shirt + Cap", 
+                    price: 34.99, 
+                    originalPrice: 44.98, 
+                    image: ["tshirt.png", "cap.png"], 
+                    tag: "BUNDLE",
+                    type: "bundle"
+                },
+                { 
+                    id: 9, 
+                    name: "Back to School Pack", 
+                    price: 49.99, 
+                    originalPrice: 64.97, 
+                    image: ["tshirt.png", "cap.png", "socks.png"], 
+                    tag: "SAVE $15",
+                    type: "bundle"
+                }
+            ]; %>
+            
+            <% offers.forEach(offer => { %>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 position-relative">
+                    <span class="offer-badge"><%= offer.tag %></span>
+                    <div class="card-img-top" style="height: 200px; overflow: hidden; background-color: white;">
+                        <% if (offer.type === 'single') { %>
+                            <img src="/media/img/<%= offer.image[0] %>" alt="<%= offer.name %>" style="width: 100%; height: 100%; object-fit: contain; padding: 10px;">
+                        <% } else { %>
+                            <div class="image-grid" style="height: 100%; width: 100%;">
+                                <% if (offer.image.length === 2) { %>
+                                    <!-- Two-image layout -->
+                                    <div style="display: flex; height: 100%;">
+                                        <div style="flex: 1; padding: 5px;">
+                                            <img src="/media/img/<%= offer.image[0] %>" alt="<%= offer.name %> item 1" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                        <div style="flex: 1; padding: 5px;">
+                                            <img src="/media/img/<%= offer.image[1] %>" alt="<%= offer.name %> item 2" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                    </div>
+                                <% } else if (offer.image.length === 3) { %>
+                                    <!-- Three-image layout -->
+                                    <div style="display: flex; flex-direction: column; height: 100%;">
+                                        <div style="flex: 2; padding: 5px;">
+                                            <img src="/media/img/<%= offer.image[0] %>" alt="<%= offer.name %> item 1" style="width: 100%; height: 100%; object-fit: contain;">
+                                        </div>
+                                        <div style="flex: 1; display: flex;">
+                                            <div style="flex: 1; padding: 5px;">
+                                                <img src="/media/img/<%= offer.image[1] %>" alt="<%= offer.name %> item 2" style="width: 100%; height: 100%; object-fit: contain;">
+                                            </div>
+                                            <div style="flex: 1; padding: 5px;">
+                                                <img src="/media/img/<%= offer.image[2] %>" alt="<%= offer.name %> item 3" style="width: 100%; height: 100%; object-fit: contain;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title"><%= offer.name %></h5>
+                        <p class="card-text">
+                            <span class="text-danger fw-bold">$<%= offer.price.toFixed(2) %></span>
+                            <span class="text-muted text-decoration-line-through ms-2">$<%= offer.originalPrice.toFixed(2) %></span>
+                        </p>
+                        <button class="btn btn-primary add-to-cart" data-id="<%= offer.id %>">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <% }) %>
+        </div>
+    </div>
+    <%- include('partials/layout_footer') %>
+</body>
+</html>
