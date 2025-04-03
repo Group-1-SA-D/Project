@@ -2,6 +2,26 @@ OpenHands:
 
 Create a basic ExpressJS eCommerce template, and add a landing page and shopping cart.
 
+Can you update all of the button components so that they are red and a slightly darker red on hover?
+
+Can you ensure all of the buttons on all of the pages match?
+
+I don't know why, but some of the images aren't loading now.
+
+A few things:
+
+- I notice the "Add to cart" button is brighter than the "View Products" and similar buttons on the landing page. I like the slightly muted colors of the ones on the landing page. Can you change these all to match?
+
+- The limited edition hoodie is missing from the special offers page. The special offers page also does not work with the shopping cart.
+
+- When clicked, the buttons are blue for a split second. I think the "clicked" color should be black.
+
+If you could fix all of these, that would be super.
+
+The cart buttons are still the brighter red.
+
+Special offers are still not something I can add to the cart. Can you fix this?
+
 Flux Schnell:
 
 Professional product photo of a [insert item] on a white background, red and white, FSU text, product photo, DSLR photography
