@@ -9,6 +9,10 @@ app.set('view engine', 'ejs');
 
 // Basic routes
 app.get('/', (req, res) => {
+  res.render('index', { title: 'Home' });
+});
+
+app.get('/products', (req, res) => {  // Add this route
   res.render('products', { title: 'Our Products' });
 });
 

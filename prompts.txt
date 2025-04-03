@@ -1,0 +1,12 @@
+OpenHands:
+
+Create a basic ExpressJS eCommerce template, and add a landing page and shopping cart.
+
+Flux:
+
+Professional product photo of a [insert item] on a white background, red and white, FSU text, product photo, DSLR photography
+
+Void/DeepSeek:
+
+Add placeholder product info for a university merch store.
+
