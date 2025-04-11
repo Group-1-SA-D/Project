@@ -22,6 +22,12 @@ The cart buttons are still the brighter red.
 
 Special offers are still not something I can add to the cart. Can you fix this?
 
+Can you implement an SQLite database backend for this app?
+
+Can you clean up the extra files from testing and ensure the project is organized sensibly?
+
+Do we actually need sequelize?
+
 Flux Schnell:
 
 Professional product photo of a [insert item] on a white background, red and white, FSU text, product photo, DSLR photography
