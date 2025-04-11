@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 20px; }
+    nav { background: #333; padding: 10px; margin-bottom: 20px; }
+    nav a { color: white; margin-right: 15px; text-decoration: none; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    .actions a { margin-right: 10px; }
+    .btn { display: inline-block; padding: 5px 10px; background: #333; color: white; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="/admin/dashboard">Dashboard</a>
+    <a href="/admin/products">Manage Products</a>
+    <a href="/admin/logout">Logout</a>
+  </nav>
+
+  <h1>Manage Products</h1>
+  <a href="/admin/products/new" class="btn">Add New Product</a>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% products.forEach(product => { %>
+        <tr>
+          <td><%= product.id %></td>
+          <td><%= product.name %></td>
+          <td>$<%= product.price.toFixed(2) %></td>
+          <td><%= product.category %></td>
+          <td class="actions">
+            <a href="/admin/products/edit/<%= product.id %>" class="btn">Edit</a>
+            <a href="/admin/products/delete/<%= product.id %>" class="btn" onclick="return confirm('Delete this product?')">Delete</a>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</body>
+</html>
