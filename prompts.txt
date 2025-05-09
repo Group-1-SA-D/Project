@@ -60,3 +60,91 @@ I got this error when I tried to add something to the cart.
 
 Make it so that you can remove items from the cart.
 
+Can you configure a basic database in this project using sqlite3?
+
+It's immedately crashing when I run npm start.
+
+Starting server initialization...
+Server startup failed: ReferenceError: initDB is not defined
+    at startServer (C:\Users\Evan\Documents\Prototype\index.js:15:5)
+    at Object.<anonymous> (C:\Users\Evan\Documents\Prototype\index.js:51:1)
+    at Module._compile (node:internal/modules/cjs/loader:1239:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1293:10)
+    at Module.load (node:internal/modules/cjs/loader:1096:32)
+    at Module._load (node:internal/modules/cjs/loader:935:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:84:12)
+    at node:internal/main/run_main_module:23:47
+
+It's running now, but my browser connection is being refused.
+
+I can't access the website when this project is running. Can you fix this?
+
+Can you fix it? It still is an issue.
+
+Server failed to start: Error: listen EACCES: permission denied 0.0.0.0:54991
+    at Server.setupListenHandle [as _listen2] (node:net:1724:21)
+    at listenInCluster (node:net:1789:12)
+    at doListen (node:net:1938:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21) {
+  code: 'EACCES',
+  errno: -4092,
+  syscall: 'listen',
+  address: '0.0.0.0',
+  port: 54991
+}
+
+Server is working!
+
+I see this at that localhost address, but where is the rest of the express site?
+
+Error: Failed to lookup view "404" in views directory "C:\Users\Evan\Documents\Prototype\views"
+    at Function.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\application.js:562:17)
+    at ServerResponse.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\response.js:909:7)
+    at C:\Users\Evan\Documents\Prototype\index.js:73:19
+    at Layer.handleRequest (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:342:13)
+    at C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:297:9
+    at processParams (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:582:12)
+    at next (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:291:5)
+    at Immediate._onImmediate (C:\Users\Evan\Documents\Prototype\node_modules\express-session\index.js:514:7)
+    at process.processImmediate (node:internal/timers:473:21)
+ReferenceError: C:\Users\Evan\Documents\Prototype\views\products.ejs:5
+    3| <head>
+    4|     <%- include('partials/layout_head') %>
+ >> 5|     <title><%= title %></title>
+    6|     <style>
+    7|         .btn-primary {
+    8|             background-color: #ff0000;
+
+title is not defined
+    at eval ("C:\\Users\\Evan\\Documents\\Prototype\\views\\products.ejs":15:26)
+    at products (C:\Users\Evan\Documents\Prototype\node_modules\ejs\lib\ejs.js:703:17)
+    at tryHandleCache (C:\Users\Evan\Documents\Prototype\node_modules\ejs\lib\ejs.js:274:36)
+    at exports.renderFile [as engine] (C:\Users\Evan\Documents\Prototype\node_modules\ejs\lib\ejs.js:491:10)
+    at View.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\view.js:139:8)
+    at tryRender (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\application.js:627:10)
+    at Function.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\application.js:574:3)
+    at ServerResponse.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\response.js:909:7)
+    at C:\Users\Evan\Documents\Prototype\index.js:47:9
+Error: Failed to lookup view "404" in views directory "C:\Users\Evan\Documents\Prototype\views"
+    at Function.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\application.js:562:17)
+    at ServerResponse.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\response.js:909:7)
+    at C:\Users\Evan\Documents\Prototype\index.js:73:19
+    at Layer.handleRequest (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:342:13)
+    at C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:297:9
+    at processParams (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:582:12)
+    at next (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:291:5)
+    at Immediate._onImmediate (C:\Users\Evan\Documents\Prototype\node_modules\express-session\index.js:514:7)
+    at process.processImmediate (node:internal/timers:473:21)
+Error: Failed to lookup view "404" in views directory "C:\Users\Evan\Documents\Prototype\views"
+    at Function.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\application.js:562:17)
+    at ServerResponse.render (C:\Users\Evan\Documents\Prototype\node_modules\express\lib\response.js:909:7)
+    at C:\Users\Evan\Documents\Prototype\index.js:73:19
+    at Layer.handleRequest (C:\Users\Evan\Documents\Prototype\node_modules\router\lib\layer.js:152:17)
+    at trimPrefix (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:342:13)
+    at C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:297:9
+    at processParams (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:582:12)
+    at next (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:291:5)
+    at Immediate._onImmediate (C:\Users\Evan\Documents\Prototype\node_modules\express-session\index.js:514:7)
+    at process.processImmediate (node:internal/timers:473:21)
