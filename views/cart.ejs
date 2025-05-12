@@ -53,13 +53,21 @@
                         </tr>
                         <% }); %>
                     </tbody>
+                    <% if (cartItems && cartItems.length > 0) { %>
                     <tfoot>
                         <tr>
                             <th>Total</th>
-                            <th>$<%= total.toFixed(2) %></th>
+                            <th>$<%= total %></th>
                             <th></th>
                         </tr>
                     </tfoot>
+                    <% } else { %>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-center">Your cart is empty</td>
+                        </tr>
+                    </tfoot>
+                    <% } %>
                 </table>
                 <div class="text-end">
                     <a href="/products" class="btn btn-secondary me-2">Continue Shopping</a>
@@ -89,12 +97,25 @@
                     if (result.success) {
                         row.remove();
                         // Update total
-                        document.querySelector('tfoot th:last-child').textContent = 
-                            '$' + result.total.toFixed(2);
+                        document.querySelector('tfoot th:nth-child(2)').textContent = 
+                            '$' + result.total;
                         // Update cart count
                         document.querySelectorAll('.cart-badge').forEach(badge => {
                             badge.textContent = result.count;
                         });
+                        
+                        // Show empty cart message if needed
+                        if (result.count === 0) {
+                            document.querySelector('tbody').innerHTML = `
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <i class="bi bi-cart-x"></i>
+                                        <p class="mt-2">Your cart is empty</p>
+                                    </td>
+                                </tr>
+                            `;
+                            document.querySelector('tfoot').style.display = 'none';
+                        }
                     }
                 } catch (error) {
                     console.error('Error:', error);

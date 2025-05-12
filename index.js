@@ -21,8 +21,17 @@ app.use(express.json());
 app.use(session({
   secret: 'your-secret-key',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: { secure: false } // Set to true if using HTTPS
 }));
+
+// Initialize cart in session if it doesn't exist
+app.use((req, res, next) => {
+  if (!req.session.cart) {
+    req.session.cart = [];
+  }
+  next();
+});
 
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -58,9 +67,86 @@ app.get('/products', async (req, res) => {
   }
 });
 
-// Cart routes
+// Cart API Endpoints
+app.post('/api/cart/add', async (req, res) => {
+    try {
+        const { productId } = req.body;
+        const product = await new Promise((resolve, reject) => {
+            db.get('SELECT * FROM products WHERE id = ?', [productId], (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+            });
+        });
+
+        if (!product) {
+            return res.status(404).json({ success: false, error: 'Product not found' });
+        }
+
+        const existingItem = req.session.cart.find(item => item.id === productId);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            req.session.cart.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
+                quantity: 1
+            });
+        }
+        
+        res.json({ 
+            success: true,
+            count: req.session.cart.reduce((total, item) => total + item.quantity, 0)
+        });
+    } catch (error) {
+        console.error('Error adding to cart:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+app.get('/api/cart/count', (req, res) => {
+    const count = req.session.cart.reduce((total, item) => total + item.quantity, 0);
+    res.json({ count });
+});
+
+app.post('/api/cart/remove', (req, res) => {
+    try {
+        const { productId } = req.body;
+        req.session.cart = req.session.cart.filter(item => item.id != productId);
+        
+        const count = req.session.cart.reduce((total, item) => total + item.quantity, 0);
+        const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        
+        res.json({ 
+            success: true,
+            count,
+            total: total.toFixed(2)
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            success: false,
+            error: error.message 
+        });
+    }
+});
+
+// Cart Page Route
 app.get('/cart', (req, res) => {
-  res.render('cart');
+    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    res.render('cart', { 
+        cartItems: req.session.cart,
+        total: total ? total.toFixed(2) : '0.00',
+        user: req.session.user
+    });
+});
+
+app.get('/special-offers', (req, res) => {
+    res.render('special-offers');
+});
+
+app.get('/customer-service', (req, res) => {
+    res.render('customer-service');
 });
 
 // Admin routes
