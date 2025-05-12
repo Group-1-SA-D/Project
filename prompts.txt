@@ -148,3 +148,25 @@ Error: Failed to lookup view "404" in views directory "C:\Users\Evan\Documents\P
     at next (C:\Users\Evan\Documents\Prototype\node_modules\router\index.js:291:5)
     at Immediate._onImmediate (C:\Users\Evan\Documents\Prototype\node_modules\express-session\index.js:514:7)
     at process.processImmediate (node:internal/timers:473:21)
+
+http://localhost:50000/special-offers - Page not found
+
+Same thing with customer service
+
+Something went wrong
+
+C:\Users\Evan\Documents\Prototype\views\cart.ejs:22 20|
+21|
+Your Shopping Cart
+>> 22| <% if (cartItems.length === 0) { %> 23|
+24|
+25|
+cartItems is not defined
+
+Return home
+
+None of the add to cart buttons work.
+
+The remove button on the cart page does not work.
+
+Can you list all of the prompts I prompted you with and add them to the Void section of prompts.txt?
