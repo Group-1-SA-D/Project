@@ -20,7 +20,7 @@
 
   <h1><%= title %></h1>
   
-  <form method="POST" action="<%= product ? '/admin/products/update/' + product.id : '/admin/products' %>">
+  <form method="POST" action="<%= product ? '/admin/products/edit/' + product.id : '/admin/products/add' %>">
     <div class="form-group">
       <label>Product Name</label>
       <input type="text" name="name" value="<%= product ? product.name : '' %>" required>
@@ -42,6 +42,7 @@
     <div class="form-group">
       <label>Image Filename</label>
       <input type="text" name="image" value="<%= product ? product.image : '' %>" required>
+      <small>Available images: tshirt.png, Hoodie.png, cap.png, cards.png, Mug.png, Socks.png</small>
     </div>
     
     <button type="submit">Save Product</button>

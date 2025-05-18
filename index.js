@@ -149,13 +149,169 @@ app.get('/customer-service', (req, res) => {
     res.render('customer-service');
 });
 
+// Admin authentication middleware
+const requireAdmin = (req, res, next) => {
+  if (!req.session.adminLoggedIn) {
+    return res.redirect('/admin/login');
+  }
+  next();
+};
+
 // Admin routes
 app.get('/admin', (req, res) => {
   res.redirect('/admin/login');
 });
 
 app.get('/admin/login', (req, res) => {
-  res.render('admin-login');
+  res.render('admin-login', { 
+    title: 'Admin Login',
+    error: null 
+  });
+});
+
+app.post('/admin/login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    const user = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!user) {
+      return res.render('admin-login', { error: 'Invalid credentials' });
+    }
+
+    const match = await bcrypt.compare(password, user.password_hash);
+    if (!match) {
+      return res.render('admin-login', { error: 'Invalid credentials' });
+    }
+
+    req.session.adminLoggedIn = true;
+    res.redirect('/admin/dashboard');
+  } catch (error) {
+    console.error('Login error:', error);
+    res.render('admin-login', { error: 'Login failed' });
+  }
+});
+
+app.get('/admin/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/admin/login');
+});
+
+app.get('/admin/dashboard', requireAdmin, (req, res) => {
+  res.render('admin-dashboard', {
+    title: 'Admin Dashboard'
+  });
+});
+
+// Product management routes
+app.get('/admin/products', requireAdmin, async (req, res) => {
+  try {
+    const products = await new Promise((resolve, reject) => {
+      db.all('SELECT * FROM products', [], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+    res.render('admin-products', { 
+      products,
+      title: 'Manage Products' 
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.get('/admin/products/add', requireAdmin, (req, res) => {
+  res.render('admin-product-form', { 
+    product: null,
+    title: 'Add New Product'
+  });
+});
+
+app.post('/admin/products/add', requireAdmin, async (req, res) => {
+  const { name, price, category, image } = req.body;
+  
+  try {
+    await new Promise((resolve, reject) => {
+      db.run(
+        'INSERT INTO products (name, price, category, image) VALUES (?, ?, ?, ?)',
+        [name, price, category, image],
+        (err) => err ? reject(err) : resolve()
+      );
+    });
+    res.redirect('/admin/products');
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.render('admin-product-form', { 
+      product: null,
+      error: 'Failed to add product' 
+    });
+  }
+});
+
+app.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
+  try {
+    const product = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM products WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+    
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+    
+    res.render('admin-product-form', { 
+      product,
+      title: 'Edit Product' 
+    });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).send('Server Error');
+  }
+});
+
+app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
+  const { name, price, category, image } = req.body;
+  
+  try {
+    await new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE products SET name = ?, price = ?, category = ?, image = ? WHERE id = ?',
+        [name, price, category, image, req.params.id],
+        (err) => err ? reject(err) : resolve()
+      );
+    });
+    res.redirect('/admin/products');
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.render('admin-product-form', { 
+      product: req.body,
+      error: 'Failed to update product' 
+    });
+  }
+});
+
+app.post('/admin/products/delete/:id', requireAdmin, async (req, res) => {
+  try {
+    await new Promise((resolve, reject) => {
+      db.run('DELETE FROM products WHERE id = ?', [req.params.id], (err) => {
+        if (err) reject(err);
+        else resolve();
+      });
+    });
+    res.redirect('/admin/products');
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).send('Failed to delete product');
+  }
 });
 
 // Static files
