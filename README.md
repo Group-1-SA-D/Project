@@ -17,7 +17,7 @@ npm install
 ```bash
 npm start
 ```
-4. Access the application at: http://localhost:53400
+4. Access the application at: http://localhost:50000
 
 ## Project Structure
 - `public/` - Static assets (CSS, JS, images)

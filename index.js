@@ -67,6 +67,30 @@ app.get('/products', async (req, res) => {
   }
 });
 
+app.get('/products/:id', async (req, res) => {
+  try {
+    const product = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM products WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!product) {
+      return res.status(404).send('Product not found - <a href="/products">Return to products</a>');
+    }
+
+    res.render('product-detail', {
+      title: product.name,
+      product,
+      user: req.session.user
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Cart API Endpoints
 app.post('/api/cart/add', async (req, res) => {
     try {
@@ -128,6 +152,21 @@ app.post('/api/cart/remove', (req, res) => {
             success: false,
             error: error.message 
         });
+    }
+});
+
+app.post('/api/cart/clear', async (req, res) => {
+    try {
+        // Clear the cart session or database entries
+        req.session.cart = [];
+        
+        // Or if using database:
+        // await CartItem.deleteMany({ sessionId: req.sessionID });
+        
+        res.json({ success: true });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Failed to clear cart' });
     }
 });
 
@@ -227,21 +266,22 @@ app.get('/admin/products', requireAdmin, async (req, res) => {
   }
 });
 
-app.get('/admin/products/add', requireAdmin, (req, res) => {
+app.get(['/admin/products/add', '/admin/products/new'], requireAdmin, (req, res) => {
   res.render('admin-product-form', { 
     product: null,
-    title: 'Add New Product'
+    title: 'Add New Product',
+    error: null
   });
 });
 
 app.post('/admin/products/add', requireAdmin, async (req, res) => {
-  const { name, price, category, image } = req.body;
+  const { name, price, category, image, description } = req.body;
   
   try {
     await new Promise((resolve, reject) => {
       db.run(
-        'INSERT INTO products (name, price, category, image) VALUES (?, ?, ?, ?)',
-        [name, price, category, image],
+        'INSERT INTO products (name, price, category, image, description) VALUES (?, ?, ?, ?, ?)',
+        [name, price, category, image, description],
         (err) => err ? reject(err) : resolve()
       );
     });
@@ -249,7 +289,8 @@ app.post('/admin/products/add', requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('Error adding product:', error);
     res.render('admin-product-form', { 
-      product: null,
+      product: req.body,
+      title: 'Add New Product',
       error: 'Failed to add product' 
     });
   }
@@ -270,7 +311,8 @@ app.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
     
     res.render('admin-product-form', { 
       product,
-      title: 'Edit Product' 
+      title: 'Edit Product',
+      error: null
     });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -279,13 +321,13 @@ app.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
 });
 
 app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
-  const { name, price, category, image } = req.body;
+  const { name, price, category, image, description } = req.body;
   
   try {
     await new Promise((resolve, reject) => {
       db.run(
-        'UPDATE products SET name = ?, price = ?, category = ?, image = ? WHERE id = ?',
-        [name, price, category, image, req.params.id],
+        'UPDATE products SET name = ?, price = ?, category = ?, image = ?, description = ? WHERE id = ?',
+        [name, price, category, image, description || '', req.params.id],
         (err) => err ? reject(err) : resolve()
       );
     });
@@ -294,6 +336,7 @@ app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
     console.error('Error updating product:', error);
     res.render('admin-product-form', { 
       product: req.body,
+      title: 'Edit Product',
       error: 'Failed to update product' 
     });
   }
@@ -356,6 +399,27 @@ async function initDB() {
         )`, (err) => err ? reject(err) : resolve());
     });
 
+    // Add description column if it doesn't exist
+    await new Promise((resolve, reject) => {
+      db.run(`
+        ALTER TABLE products ADD COLUMN description TEXT DEFAULT ''
+      `, (err) => {
+        // Ignore "duplicate column" errors
+        if (err && !err.message.includes('duplicate column')) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // Update existing products with empty descriptions if needed
+    await new Promise((resolve, reject) => {
+      db.run(`
+        UPDATE products SET description = '' WHERE description IS NULL
+      `, (err) => err ? reject(err) : resolve());
+    });
+
     // Check if table is empty
     const rowCount = await new Promise((resolve) => {
       db.get('SELECT COUNT(*) as count FROM products', [], (err, row) => {
@@ -365,17 +429,17 @@ async function initDB() {
 
     if (rowCount === 0) {
       console.log('Seeding initial data...');
-      await new Promise((resolve, reject) => {
-        db.run(`
-          INSERT INTO products (name, price, category, image) VALUES
-          ('Classic T-Shirt', 18.99, 'Apparel', 'tshirt.png'),
-          ('Hoodie', 34.99, 'Apparel', 'Hoodie.png'),
-          ('Baseball Cap', 19.99, 'Apparel', 'cap.png'),
-          ('Trading Card Booster', 4.99, 'Merchandise', 'cards.png'),
-          ('Premium Mug', 14.99, 'Merchandise', 'Mug.png'),
-          ('Socks', 11.99, 'Apparel', 'Socks.png'),
-          ('Limited Edition Hoodie', 29.99, 'Apparel', 'Hoodie.png')
-        `, (err) => err ? reject(err) : resolve());
+        await new Promise((resolve, reject) => {
+          db.run(`
+            INSERT INTO products (name, price, category, image, description) VALUES
+            ('Classic T-Shirt', 18.99, 'Apparel', 'tshirt.png', 'Our classic cotton t-shirt with comfortable fit and durable print. Available in multiple colors.'),
+            ('Hoodie', 34.99, 'Apparel', 'Hoodie.png', 'Warm and cozy hoodie with kangaroo pocket and adjustable drawstrings. Perfect for chilly days.'),
+            ('Baseball Cap', 19.99, 'Apparel', 'cap.png', 'Adjustable baseball cap with structured front and curved visor. One size fits most.'),
+            ('Trading Card Booster', 4.99, 'Merchandise', 'cards.png', 'Random assortment of 10 trading cards from our collection. Each pack contains at least one rare card!'),
+            ('Premium Mug', 14.99, 'Merchandise', 'Mug.png', 'High-quality ceramic mug with vibrant print that won''t fade. Microwave and dishwasher safe.'),
+            ('Socks', 11.99, 'Apparel', 'Socks.png', 'Comfortable crew socks with reinforced heel and toe for durability. Pack of 3 pairs.'),
+            ('Limited Edition Hoodie', 29.99, 'Apparel', 'Hoodie.png', 'Special edition hoodie with exclusive design. Limited stock available!')
+          `, (err) => err ? reject(err) : resolve());
       });
       console.log('Database seeded successfully');
     } else {

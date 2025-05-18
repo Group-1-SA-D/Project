@@ -5,8 +5,23 @@
   <style>
     body { font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
     .error { color: red; margin-bottom: 15px; }
-    input { display: block; width: 100%; padding: 8px; margin: 8px 0; }
-    button { background: #333; color: white; padding: 10px; border: none; width: 100%; }
+    input { 
+      display: block; 
+      width: calc(100% - 16px); /* Account for padding */
+      padding: 8px; 
+      margin: 8px 0;
+      box-sizing: border-box;
+    }
+    button { 
+      background: #333; 
+      color: white; 
+      padding: 8px; 
+      border: none; 
+      width: calc(100% - 16px); /* Match input field width */
+      margin: 8px 0;
+      font-size: 1em;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>

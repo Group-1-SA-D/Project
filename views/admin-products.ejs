@@ -41,7 +41,9 @@
           <td><%= product.category %></td>
           <td class="actions">
             <a href="/admin/products/edit/<%= product.id %>" class="btn">Edit</a>
-            <a href="/admin/products/delete/<%= product.id %>" class="btn" onclick="return confirm('Delete this product?')">Delete</a>
+            <form action="/admin/products/delete/<%= product.id %>" method="POST" style="display: inline;">
+              <button type="submit" class="btn" onclick="return confirm('Delete this product?')">Delete</button>
+            </form>
           </td>
         </tr>
       <% }); %>
