@@ -180,8 +180,57 @@ app.get('/cart', (req, res) => {
     });
 });
 
-app.get('/special-offers', (req, res) => {
-    res.render('special-offers');
+// Debug route to check template data
+app.get('/debug-offers', async (req, res) => {
+    const testOffers = [
+        {
+            id: 1,
+            name: 'Test Offer',
+            price: 19.99,
+            originalPrice: 24.99,
+            image: 'tshirt.png',
+            description: 'Test description',
+            tag: 'TEST OFFER',
+            type: 'single'
+        }
+    ];
+    res.render('special-offers', {
+        offers: testOffers,
+        user: null
+    });
+});
+
+app.get('/special-offers', async (req, res) => {
+    try {
+        // Get products marked as special offers
+        const offers = await new Promise((resolve, reject) => {
+            db.all(`
+                SELECT 
+                    id,
+                    name,
+                    price,
+                    price * 1.2 AS originalPrice,
+                    image,
+                    description,
+                    'SPECIAL OFFER' AS tag,
+                    'single' AS type
+                FROM products
+                WHERE is_special = TRUE
+                ORDER BY name
+            `, [], (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+
+        res.render('special-offers', { 
+            offers,
+            user: req.session.user
+        });
+    } catch (err) {
+        console.error('Error fetching special offers:', err);
+        res.status(500).send('Error loading special offers');
+    }
 });
 
 app.get('/customer-service', (req, res) => {
@@ -399,6 +448,28 @@ async function initDB() {
         )`, (err) => err ? reject(err) : resolve());
     });
 
+    // Add is_special column if it doesn't exist
+    await new Promise((resolve, reject) => {
+        db.run(`
+            ALTER TABLE products ADD COLUMN is_special BOOLEAN DEFAULT FALSE
+        `, (err) => {
+            // Ignore "duplicate column" errors
+            if (err && !err.message.includes('duplicate column')) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+
+    // Mark some products as special offers
+    await new Promise((resolve, reject) => {
+        db.run(`
+            UPDATE products SET is_special = TRUE 
+            WHERE name IN ('Trading Card Booster', 'Premium Mug', 'Limited Edition Hoodie')
+        `, (err) => err ? reject(err) : resolve());
+    });
+
     // Add description column if it doesn't exist
     await new Promise((resolve, reject) => {
       db.run(`
@@ -431,14 +502,14 @@ async function initDB() {
       console.log('Seeding initial data...');
         await new Promise((resolve, reject) => {
           db.run(`
-            INSERT INTO products (name, price, category, image, description) VALUES
-            ('Classic T-Shirt', 18.99, 'Apparel', 'tshirt.png', 'Our classic cotton t-shirt with comfortable fit and durable print. Available in multiple colors.'),
-            ('Hoodie', 34.99, 'Apparel', 'Hoodie.png', 'Warm and cozy hoodie with kangaroo pocket and adjustable drawstrings. Perfect for chilly days.'),
-            ('Baseball Cap', 19.99, 'Apparel', 'cap.png', 'Adjustable baseball cap with structured front and curved visor. One size fits most.'),
-            ('Trading Card Booster', 4.99, 'Merchandise', 'cards.png', 'Random assortment of 10 trading cards from our collection. Each pack contains at least one rare card!'),
-            ('Premium Mug', 14.99, 'Merchandise', 'Mug.png', 'High-quality ceramic mug with vibrant print that won''t fade. Microwave and dishwasher safe.'),
-            ('Socks', 11.99, 'Apparel', 'Socks.png', 'Comfortable crew socks with reinforced heel and toe for durability. Pack of 3 pairs.'),
-            ('Limited Edition Hoodie', 29.99, 'Apparel', 'Hoodie.png', 'Special edition hoodie with exclusive design. Limited stock available!')
+            INSERT INTO products (name, price, category, image, description, is_special) VALUES
+            ('Classic T-Shirt', 18.99, 'Apparel', 'tshirt.png', 'Our classic cotton t-shirt with comfortable fit and durable print. Available in multiple colors.', FALSE),
+            ('Hoodie', 34.99, 'Apparel', 'Hoodie.png', 'Warm and cozy hoodie with kangaroo pocket and adjustable drawstrings. Perfect for chilly days.', FALSE),
+            ('Baseball Cap', 19.99, 'Apparel', 'cap.png', 'Adjustable baseball cap with structured front and curved visor. One size fits most.', FALSE),
+            ('Trading Card Booster', 4.99, 'Merchandise', 'cards.png', 'Random assortment of 10 trading cards from our collection. Each pack contains at least one rare card!', TRUE),
+            ('Premium Mug', 14.99, 'Merchandise', 'Mug.png', 'High-quality ceramic mug with vibrant print that won''t fade. Microwave and dishwasher safe.', TRUE),
+            ('Socks', 11.99, 'Apparel', 'Socks.png', 'Comfortable crew socks with reinforced heel and toe for durability. Pack of 3 pairs.', FALSE),
+            ('Limited Edition Hoodie', 29.99, 'Apparel', 'Hoodie.png', 'Special edition hoodie with exclusive design. Limited stock available!', TRUE)
           `, (err) => err ? reject(err) : resolve());
       });
       console.log('Database seeded successfully');
