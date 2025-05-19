@@ -133,6 +133,13 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="is_special" <%= product && product.is_special ? 'checked' : '' %>>
+          Mark as Special Offer
+        </label>
+      </div>
+
       <div style="margin-top: 20px;">
         <button type="submit">Save Product</button>
         <a href="/admin/products" style="margin-left: 10px; color: #333; text-decoration: none;">Cancel</a>

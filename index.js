@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
+const morgan = require('morgan');
 const { db, initializeDatabase } = require('./db');
 
 // Admin credentials
@@ -13,6 +14,7 @@ const app = express();
 // ======================
 // Middleware Setup
 // ======================
+app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -299,8 +301,19 @@ app.get('/admin/dashboard', requireAdmin, (req, res) => {
 // Product management routes
 app.get('/admin/products', requireAdmin, async (req, res) => {
   try {
+    let query = 'SELECT * FROM products';
+    const params = [];
+    
+    if (req.query.special === 'true') {
+      query += ' WHERE is_special = TRUE';
+    } else if (req.query.special === 'false') {
+      query += ' WHERE is_special = FALSE';
+    }
+    
+    query += ' ORDER BY name';
+    
     const products = await new Promise((resolve, reject) => {
-      db.all('SELECT * FROM products', [], (err, rows) => {
+      db.all(query, params, (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
@@ -329,19 +342,20 @@ app.post('/admin/products/add', requireAdmin, async (req, res) => {
   try {
     await new Promise((resolve, reject) => {
       db.run(
-        'INSERT INTO products (name, price, category, image, description) VALUES (?, ?, ?, ?, ?)',
-        [name, price, category, image, description],
+        'INSERT INTO products (name, price, category, image, description, is_special) VALUES (?, ?, ?, ?, ?, ?)',
+        [name, price, category, image, description, req.body.is_special === 'on'],
         (err) => err ? reject(err) : resolve()
       );
     });
-    res.redirect('/admin/products');
+    const redirectUrl = req.query.redirect || '/admin/products';
+    res.redirect(redirectUrl);
   } catch (error) {
-    console.error('Error adding product:', error);
-    res.render('admin-product-form', { 
-      product: req.body,
-      title: 'Add New Product',
-      error: 'Failed to add product' 
-    });
+    console.error('Error toggling special offer:', error);
+    res.status(500).send(`
+      <h1>Error toggling special offer status</h1>
+      <p>${error.message}</p>
+      <a href="/admin/products">Return to products</a>
+    `);
   }
 });
 
@@ -375,8 +389,8 @@ app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
   try {
     await new Promise((resolve, reject) => {
       db.run(
-        'UPDATE products SET name = ?, price = ?, category = ?, image = ?, description = ? WHERE id = ?',
-        [name, price, category, image, description || '', req.params.id],
+        'UPDATE products SET name = ?, price = ?, category = ?, image = ?, description = ?, is_special = ? WHERE id = ?',
+        [name, price, category, image, description || '', req.body.is_special === 'on', req.params.id],
         (err) => err ? reject(err) : resolve()
       );
     });
@@ -388,6 +402,42 @@ app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
       title: 'Edit Product',
       error: 'Failed to update product' 
     });
+  }
+});
+
+app.post('/admin/products/toggle-special/:id', requireAdmin, async (req, res) => {
+  try {
+    // First verify the product exists
+    const product = await new Promise((resolve, reject) => {
+      db.get('SELECT id FROM products WHERE id = ?', [req.params.id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+
+    // Toggle the special status
+    await new Promise((resolve, reject) => {
+      db.run(
+        'UPDATE products SET is_special = NOT is_special WHERE id = ?',
+        [req.params.id],
+        (err) => err ? reject(err) : resolve()
+      );
+    });
+
+    // Redirect to either the specified page or products list
+    const redirectUrl = req.query.redirect || '/admin/products';
+    res.redirect(redirectUrl);
+  } catch (error) {
+    console.error('Error toggling special offer:', error);
+    res.status(500).send(`
+      <h1>Error toggling special offer status</h1>
+      <p>${error.message}</p>
+      <a href="/admin/products">Return to products</a>
+    `);
   }
 });
 
