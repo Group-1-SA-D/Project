@@ -132,8 +132,11 @@ app.post('/api/cart/add', async (req, res) => {
 });
 
 app.get('/api/cart/count', (req, res) => {
-    const count = req.session.cart.reduce((total, item) => total + item.quantity, 0);
+    const count = req.session.cart ? req.session.cart.reduce((total, item) => total + item.quantity, 0) : 0;
     res.json({ count });
+    
+    // Refresh session to prevent staleness
+    req.session.touch();
 });
 
 app.post('/api/cart/remove', (req, res) => {
@@ -178,6 +181,73 @@ app.get('/cart', (req, res) => {
     res.render('cart', { 
         cartItems: req.session.cart,
         total: total ? total.toFixed(2) : '0.00',
+        user: req.session.user
+    });
+});
+
+// Checkout routes
+app.get('/checkout', (req, res) => {
+    if (!req.session.cart || req.session.cart.length === 0) {
+        return res.redirect('/cart');
+    }
+    
+    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    res.render('checkout', {
+        cartItems: req.session.cart,
+        total: total.toFixed(2),
+        user: req.session.user
+    });
+});
+
+app.post('/checkout/process', (req, res) => {
+    // In a real app, you would process payment here
+    // For now, we'll just generate a fake order ID
+    
+    if (!req.session.cart || req.session.cart.length === 0) {
+        return res.redirect('/cart');
+    }
+
+    const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
+    const deliveryDate = new Date();
+    deliveryDate.setDate(deliveryDate.getDate() + 3); // 3 days from now
+    
+    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Save order details (in a real app, you'd save to database)
+    const order = {
+        id: orderId,
+        date: new Date(),
+        items: [...req.session.cart],
+        total: total,
+        paymentInfo: {
+            cardLast4: req.body.cardNumber.slice(-4)
+        },
+        shippingInfo: req.body.sameAsBilling ? {
+            address: req.body.billingAddress,
+            city: req.body.billingCity,
+            state: req.body.billingState,
+            zip: req.body.billingZip
+        } : {
+            address: req.body.shippingAddress,
+            city: req.body.shippingCity,
+            state: req.body.shippingState,
+            zip: req.body.shippingZip
+        }
+    };
+    
+    // Clear the cart
+    req.session.cart = [];
+    
+    res.render('order-confirmation', {
+        orderId: orderId,
+        cartItems: order.items,
+        total: total.toFixed(2),
+        shippingInfo: order.shippingInfo,
+        deliveryDate: deliveryDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric' 
+        }),
         user: req.session.user
     });
 });

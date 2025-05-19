@@ -1,0 +1,66 @@
+<%- include('partials/layout_head', {title: 'Order Confirmation'}) %>
+<%- include('partials/navbar') %>
+
+<div class="container mt-5">
+    <div class="card text-center">
+        <div class="card-header bg-success text-white">
+            <h2>Order Confirmed!</h2>
+        </div>
+        <div class="card-body">
+            <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+            <h3 class="card-title">Thank you for your order!</h3>
+            <p class="card-text">Your order #<%= orderId %> has been placed successfully.</p>
+            <p>A confirmation email has been sent to your email address.</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h4>Shipping Information</h4>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <% if (shippingInfo) { %>
+                                <p><strong>Address:</strong> <%= shippingInfo.address %></p>
+                                <p><strong>City:</strong> <%= shippingInfo.city %></p>
+                                <p><strong>State/Zip:</strong> <%= shippingInfo.state %> <%= shippingInfo.zip %></p>
+                            <% } else { %>
+                                <p>Shipping information not available</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h4>Order Summary</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% cartItems.forEach(item => { %>
+                            <tr>
+                                <td><%= item.name %></td>
+                                <td><%= item.quantity %></td>
+                                <td>$<%= (item.price * item.quantity).toFixed(2) %></td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">Total</th>
+                            <th>$<%= total %></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <a href="/products" class="btn btn-primary mt-3">Continue Shopping</a>
+        </div>
+        <div class="card-footer text-muted">
+            Estimated delivery: <%= deliveryDate %>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/layout_footer') %>
