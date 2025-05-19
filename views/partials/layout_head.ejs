@@ -16,3 +16,22 @@
         border-color: #000000 !important;
     }
 </style>
+<script>
+// Global cart count updater
+function updateCartCount() {
+    fetch('/api/cart/count')
+        .then(response => response.json())
+        .then(data => {
+            document.querySelectorAll('.cart-badge').forEach(badge => {
+                badge.textContent = data.count;
+            });
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+}
+
+// Update on page load
+document.addEventListener('DOMContentLoaded', updateCartCount);
+
+// Update every 30 seconds to keep count fresh
+setInterval(updateCartCount, 30000);
+</script>

@@ -130,8 +130,11 @@ app.post('/api/cart/add', async (req, res) => {
 });
 
 app.get('/api/cart/count', (req, res) => {
-    const count = req.session.cart.reduce((total, item) => total + item.quantity, 0);
+    const count = req.session.cart ? req.session.cart.reduce((total, item) => total + item.quantity, 0) : 0;
     res.json({ count });
+    
+    // Refresh session to prevent staleness
+    req.session.touch();
 });
 
 app.post('/api/cart/remove', (req, res) => {
