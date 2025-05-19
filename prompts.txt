@@ -170,3 +170,12 @@ None of the add to cart buttons work.
 The remove button on the cart page does not work.
 
 Can you list all of the prompts I prompted you with and add them to the Void section of prompts.txt?
+
+Void/DeepSeek:
+
+1. "can you update the checkout process to where it asks for basic payment information and then gives you an order confirmation screen after"
+2. "can you add a shipping address as well for the checkout"
+3. "its still happening. What I mean is when you click add to cart on the store page dont open up the info page for the item. Only open up the info page for an item if you click on the name or picture of an item"
+4. "the cart amount is still saying 0 when on the home page and customer service page after I add an item to the cart"
+5. "can you remove the item added to cart alert when adding an item to your cart on the special offers page"
+6. "add these prompts to prompts.txt under the void/deepseek heading"
