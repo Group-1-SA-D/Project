@@ -1,0 +1,209 @@
+<%- include('partials/layout_head', {title: 'Checkout'}) %>
+<%- include('partials/navbar') %>
+
+<div class="container mt-5">
+    <h1>Checkout</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>Payment Information</h4>
+                </div>
+                <div class="card-body">
+                    <form id="checkoutForm" action="/checkout/process" method="POST">
+                        <div class="form-group">
+                            <label for="cardName">Name on Card</label>
+                            <input type="text" class="form-control" id="cardName" name="cardName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" name="cardNumber" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="expiryDate">Expiration Date</label>
+                                    <input type="text" class="form-control" id="expiryDate" name="expiryDate" placeholder="MM/YY" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" class="form-control" id="cvv" name="cvv" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <h5>Billing Address</h5>
+                        <div class="form-group">
+                            <label for="billingAddress">Street Address</label>
+                            <input type="text" class="form-control" id="billingAddress" name="billingAddress" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="billingCity">City</label>
+                                    <input type="text" class="form-control" id="billingCity" name="billingCity" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="billingState">State</label>
+                                    <input type="text" class="form-control" id="billingState" name="billingState" required>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="billingZip">Zip Code</label>
+                                    <input type="text" class="form-control" id="billingZip" name="billingZip" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <h5>Shipping Address</h5>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="sameAsBilling" name="sameAsBilling">
+                            <label class="form-check-label" for="sameAsBilling">Same as billing address</label>
+                        </div>
+
+                        <div id="shippingAddressFields">
+                            <div class="form-group">
+                                <label for="shippingAddress">Street Address</label>
+                                <input type="text" class="form-control" id="shippingAddress" name="shippingAddress">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="shippingCity">City</label>
+                                        <input type="text" class="form-control" id="shippingCity" name="shippingCity">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="shippingState">State</label>
+                                        <input type="text" class="form-control" id="shippingState" name="shippingState">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="shippingZip">Zip Code</label>
+                                        <input type="text" class="form-control" id="shippingZip" name="shippingZip">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block mt-4">Complete Purchase</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Order Summary</h4>
+                </div>
+                <div class="card-body">
+                    <% if (cartItems && cartItems.length > 0) { %>
+                        <ul class="list-group mb-3">
+                            <% cartItems.forEach(item => { %>
+                                <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                    <div>
+                                        <h6 class="my-0"><%= item.name %></h6>
+                                        <small class="text-muted">Qty: <%= item.quantity %></small>
+                                    </div>
+                                    <span class="text-muted">$<%= (item.price * item.quantity).toFixed(2) %></span>
+                                </li>
+                            <% }); %>
+                        </ul>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Total (USD)</span>
+                            <strong>$<%= total %></strong>
+                        </div>
+                    <% } else { %>
+                        <p>Your cart is empty</p>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/layout_footer') %>
+<script>
+document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+    const cardNumber = document.getElementById('cardNumber').value.replace(/\s+/g, '');
+    const cvv = document.getElementById('cvv').value;
+    const expiry = document.getElementById('expiryDate').value;
+    
+    // Basic validation
+    if (!/^\d{13,16}$/.test(cardNumber)) {
+        alert('Please enter a valid card number (13-16 digits)');
+        e.preventDefault();
+        return;
+    }
+    
+    if (!/^\d{3,4}$/.test(cvv)) {
+        alert('Please enter a valid CVV (3-4 digits)');
+        e.preventDefault();
+        return;
+    }
+    
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
+        alert('Please enter a valid expiration date (MM/YY)');
+        e.preventDefault();
+        return;
+    }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sameAsBilling = document.getElementById('sameAsBilling');
+    const shippingFields = document.getElementById('shippingAddressFields');
+    
+    // Toggle shipping fields when checkbox changes
+    sameAsBilling.addEventListener('change', function() {
+        const inputs = shippingFields.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.disabled = this.checked;
+            if (this.checked) {
+                input.removeAttribute('required');
+            } else {
+                input.setAttribute('required', '');
+            }
+        });
+    });
+
+    // Copy billing to shipping when checkbox is checked
+    sameAsBilling.addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('shippingAddress').value = document.getElementById('billingAddress').value;
+            document.getElementById('shippingCity').value = document.getElementById('billingCity').value;
+            document.getElementById('shippingState').value = document.getElementById('billingState').value;
+            document.getElementById('shippingZip').value = document.getElementById('billingZip').value;
+        }
+    });
+
+    // Form validation
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        if (!sameAsBilling.checked) {
+            const shippingAddress = document.getElementById('shippingAddress').value;
+            const shippingCity = document.getElementById('shippingCity').value;
+            const shippingState = document.getElementById('shippingState').value;
+            const shippingZip = document.getElementById('shippingZip').value;
+            
+            if (!shippingAddress || !shippingCity || !shippingState || !shippingZip) {
+                alert('Please fill in all shipping address fields or check "Same as billing address"');
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+});
+</script>
