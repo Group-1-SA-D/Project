@@ -58,10 +58,10 @@ app.get('/products', async (req, res) => {
         else resolve(rows);
       });
     });
-    res.render('products', { 
+    res.render('products', {
       title: 'Products',
       products,
-      user: req.session.user 
+      user: req.session.user
     });
   } catch (err) {
     console.error(err);
@@ -95,188 +95,188 @@ app.get('/products/:id', async (req, res) => {
 
 // Cart API Endpoints
 app.post('/api/cart/add', async (req, res) => {
-    try {
-        const { productId } = req.body;
-        const product = await new Promise((resolve, reject) => {
-            db.get('SELECT * FROM products WHERE id = ?', [productId], (err, row) => {
-                if (err) reject(err);
-                else resolve(row);
-            });
-        });
+  try {
+    const { productId } = req.body;
+    const product = await new Promise((resolve, reject) => {
+      db.get('SELECT * FROM products WHERE id = ?', [productId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
 
-        if (!product) {
-            return res.status(404).json({ success: false, error: 'Product not found' });
-        }
-
-        const existingItem = req.session.cart.find(item => item.id === productId);
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            req.session.cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                quantity: 1
-            });
-        }
-        
-        res.json({ 
-            success: true,
-            count: req.session.cart.reduce((total, item) => total + item.quantity, 0)
-        });
-    } catch (error) {
-        console.error('Error adding to cart:', error);
-        res.status(500).json({ success: false, error: error.message });
+    if (!product) {
+      return res.status(404).json({ success: false, error: 'Product not found' });
     }
+
+    const existingItem = req.session.cart.find(item => item.id === productId);
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      req.session.cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1
+      });
+    }
+
+    res.json({
+      success: true,
+      count: req.session.cart.reduce((total, item) => total + item.quantity, 0)
+    });
+  } catch (error) {
+    console.error('Error adding to cart:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 app.get('/api/cart/count', (req, res) => {
-    const count = req.session.cart ? req.session.cart.reduce((total, item) => total + item.quantity, 0) : 0;
-    res.json({ count });
-    
-    // Refresh session to prevent staleness
-    req.session.touch();
+  const count = req.session.cart ? req.session.cart.reduce((total, item) => total + item.quantity, 0) : 0;
+  res.json({ count });
+
+  // Refresh session to prevent staleness
+  req.session.touch();
 });
 
 app.post('/api/cart/remove', (req, res) => {
-    try {
-        const { productId } = req.body;
-        req.session.cart = req.session.cart.filter(item => item.id != productId);
-        
-        const count = req.session.cart.reduce((total, item) => total + item.quantity, 0);
-        const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        
-        res.json({ 
-            success: true,
-            count,
-            total: total.toFixed(2)
-        });
-    } catch (error) {
-        res.status(500).json({ 
-            success: false,
-            error: error.message 
-        });
-    }
+  try {
+    const { productId } = req.body;
+    req.session.cart = req.session.cart.filter(item => item.id != productId);
+
+    const count = req.session.cart.reduce((total, item) => total + item.quantity, 0);
+    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+    res.json({
+      success: true,
+      count,
+      total: total.toFixed(2)
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 app.post('/api/cart/clear', async (req, res) => {
-    try {
-        // Clear the cart session or database entries
-        req.session.cart = [];
-        
-        // Or if using database:
-        // await CartItem.deleteMany({ sessionId: req.sessionID });
-        
-        res.json({ success: true });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to clear cart' });
-    }
+  try {
+    // Clear the cart session or database entries
+    req.session.cart = [];
+
+    // Or if using database:
+    // await CartItem.deleteMany({ sessionId: req.sessionID });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to clear cart' });
+  }
 });
 
 // Cart Page Route
 app.get('/cart', (req, res) => {
-    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    res.render('cart', { 
-        cartItems: req.session.cart,
-        total: total ? total.toFixed(2) : '0.00',
-        user: req.session.user
-    });
+  const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  res.render('cart', {
+    cartItems: req.session.cart,
+    total: total ? total.toFixed(2) : '0.00',
+    user: req.session.user
+  });
 });
 
 // Checkout routes
 app.get('/checkout', (req, res) => {
-    if (!req.session.cart || req.session.cart.length === 0) {
-        return res.redirect('/cart');
-    }
-    
-    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    res.render('checkout', {
-        cartItems: req.session.cart,
-        total: total.toFixed(2),
-        user: req.session.user
-    });
+  if (!req.session.cart || req.session.cart.length === 0) {
+    return res.redirect('/cart');
+  }
+
+  const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  res.render('checkout', {
+    cartItems: req.session.cart,
+    total: total.toFixed(2),
+    user: req.session.user
+  });
 });
 
 app.post('/checkout/process', (req, res) => {
-    // In a real app, you would process payment here
-    // For now, we'll just generate a fake order ID
-    
-    if (!req.session.cart || req.session.cart.length === 0) {
-        return res.redirect('/cart');
-    }
+  // In a real app, you would process payment here
+  // For now, we'll just generate a fake order ID
 
-    const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
-    const deliveryDate = new Date();
-    deliveryDate.setDate(deliveryDate.getDate() + 3); // 3 days from now
-    
-    const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Save order details (in a real app, you'd save to database)
-    const order = {
-        id: orderId,
-        date: new Date(),
-        items: [...req.session.cart],
-        total: total,
-        paymentInfo: {
-            cardLast4: req.body.cardNumber.slice(-4)
-        },
-        shippingInfo: req.body.sameAsBilling ? {
-            address: req.body.billingAddress,
-            city: req.body.billingCity,
-            state: req.body.billingState,
-            zip: req.body.billingZip
-        } : {
-            address: req.body.shippingAddress,
-            city: req.body.shippingCity,
-            state: req.body.shippingState,
-            zip: req.body.shippingZip
-        }
-    };
-    
-    // Clear the cart
-    req.session.cart = [];
-    
-    res.render('order-confirmation', {
-        orderId: orderId,
-        cartItems: order.items,
-        total: total.toFixed(2),
-        shippingInfo: order.shippingInfo,
-        deliveryDate: deliveryDate.toLocaleDateString('en-US', { 
-            weekday: 'long', 
-            month: 'long', 
-            day: 'numeric' 
-        }),
-        user: req.session.user
-    });
+  if (!req.session.cart || req.session.cart.length === 0) {
+    return res.redirect('/cart');
+  }
+
+  const orderId = 'ORD-' + Math.floor(Math.random() * 1000000);
+  const deliveryDate = new Date();
+  deliveryDate.setDate(deliveryDate.getDate() + 3); // 3 days from now
+
+  const total = req.session.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  // Save order details (in a real app, you'd save to database)
+  const order = {
+    id: orderId,
+    date: new Date(),
+    items: [...req.session.cart],
+    total: total,
+    paymentInfo: {
+      cardLast4: req.body.cardNumber.slice(-4)
+    },
+    shippingInfo: req.body.sameAsBilling ? {
+      address: req.body.billingAddress,
+      city: req.body.billingCity,
+      state: req.body.billingState,
+      zip: req.body.billingZip
+    } : {
+      address: req.body.shippingAddress,
+      city: req.body.shippingCity,
+      state: req.body.shippingState,
+      zip: req.body.shippingZip
+    }
+  };
+
+  // Clear the cart
+  req.session.cart = [];
+
+  res.render('order-confirmation', {
+    orderId: orderId,
+    cartItems: order.items,
+    total: total.toFixed(2),
+    shippingInfo: order.shippingInfo,
+    deliveryDate: deliveryDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    }),
+    user: req.session.user
+  });
 });
 
 // Debug route to check template data
 app.get('/debug-offers', async (req, res) => {
-    const testOffers = [
-        {
-            id: 1,
-            name: 'Test Offer',
-            price: 19.99,
-            originalPrice: 24.99,
-            image: 'tshirt.png',
-            description: 'Test description',
-            tag: 'TEST OFFER',
-            type: 'single'
-        }
-    ];
-    res.render('special-offers', {
-        offers: testOffers,
-        user: null
-    });
+  const testOffers = [
+    {
+      id: 1,
+      name: 'Test Offer',
+      price: 19.99,
+      originalPrice: 24.99,
+      image: 'tshirt.png',
+      description: 'Test description',
+      tag: 'TEST OFFER',
+      type: 'single'
+    }
+  ];
+  res.render('special-offers', {
+    offers: testOffers,
+    user: null
+  });
 });
 
 app.get('/special-offers', async (req, res) => {
-    try {
-        // Get products marked as special offers
-        const offers = await new Promise((resolve, reject) => {
-            db.all(`
+  try {
+    // Get products marked as special offers
+    const offers = await new Promise((resolve, reject) => {
+      db.all(`
                 SELECT 
                     id,
                     name,
@@ -290,23 +290,23 @@ app.get('/special-offers', async (req, res) => {
                 WHERE is_special = TRUE
                 ORDER BY name
             `, [], (err, rows) => {
-                if (err) reject(err);
-                else resolve(rows);
-            });
-        });
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
 
-        res.render('special-offers', { 
-            offers,
-            user: req.session.user
-        });
-    } catch (err) {
-        console.error('Error fetching special offers:', err);
-        res.status(500).send('Error loading special offers');
-    }
+    res.render('special-offers', {
+      offers,
+      user: req.session.user
+    });
+  } catch (err) {
+    console.error('Error fetching special offers:', err);
+    res.status(500).send('Error loading special offers');
+  }
 });
 
 app.get('/customer-service', (req, res) => {
-    res.render('customer-service');
+  res.render('customer-service');
 });
 
 // Admin authentication middleware
@@ -323,15 +323,15 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/admin/login', (req, res) => {
-  res.render('admin-login', { 
+  res.render('admin-login', {
     title: 'Admin Login',
-    error: null 
+    error: null
   });
 });
 
 app.post('/admin/login', async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
     const user = await new Promise((resolve, reject) => {
       db.get('SELECT * FROM users WHERE username = ?', [username], (err, row) => {
@@ -341,19 +341,19 @@ app.post('/admin/login', async (req, res) => {
     });
 
     if (!user) {
-      return res.render('admin-login', { error: 'Invalid credentials' });
+      return res.render('admin-login', { title: 'Admin Login', error: 'Invalid credentials' });
     }
 
     const match = await bcrypt.compare(password, user.password_hash);
     if (!match) {
-      return res.render('admin-login', { error: 'Invalid credentials' });
+      return res.render('admin-login', { title: 'Admin Login', error: 'Invalid credentials' });
     }
 
     req.session.adminLoggedIn = true;
     res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('Login error:', error);
-    res.render('admin-login', { error: 'Login failed' });
+    res.render('admin-login', { title: 'Admin Login', error: 'Login failed' });
   }
 });
 
@@ -373,24 +373,24 @@ app.get('/admin/products', requireAdmin, async (req, res) => {
   try {
     let query = 'SELECT * FROM products';
     const params = [];
-    
+
     if (req.query.special === 'true') {
       query += ' WHERE is_special = TRUE';
     } else if (req.query.special === 'false') {
       query += ' WHERE is_special = FALSE';
     }
-    
+
     query += ' ORDER BY name';
-    
+
     const products = await new Promise((resolve, reject) => {
       db.all(query, params, (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
     });
-    res.render('admin-products', { 
+    res.render('admin-products', {
       products,
-      title: 'Manage Products' 
+      title: 'Manage Products'
     });
   } catch (err) {
     console.error(err);
@@ -399,7 +399,7 @@ app.get('/admin/products', requireAdmin, async (req, res) => {
 });
 
 app.get(['/admin/products/add', '/admin/products/new'], requireAdmin, (req, res) => {
-  res.render('admin-product-form', { 
+  res.render('admin-product-form', {
     product: null,
     title: 'Add New Product',
     error: null
@@ -408,7 +408,7 @@ app.get(['/admin/products/add', '/admin/products/new'], requireAdmin, (req, res)
 
 app.post('/admin/products/add', requireAdmin, async (req, res) => {
   const { name, price, category, image, description } = req.body;
-  
+
   try {
     await new Promise((resolve, reject) => {
       db.run(
@@ -437,12 +437,12 @@ app.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
         else resolve(row);
       });
     });
-    
+
     if (!product) {
       return res.status(404).send('Product not found');
     }
-    
-    res.render('admin-product-form', { 
+
+    res.render('admin-product-form', {
       product,
       title: 'Edit Product',
       error: null
@@ -455,7 +455,7 @@ app.get('/admin/products/edit/:id', requireAdmin, async (req, res) => {
 
 app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
   const { name, price, category, image, description } = req.body;
-  
+
   try {
     await new Promise((resolve, reject) => {
       db.run(
@@ -467,10 +467,10 @@ app.post('/admin/products/edit/:id', requireAdmin, async (req, res) => {
     res.redirect('/admin/products');
   } catch (error) {
     console.error('Error updating product:', error);
-    res.render('admin-product-form', { 
+    res.render('admin-product-form', {
       product: req.body,
       title: 'Edit Product',
-      error: 'Failed to update product' 
+      error: 'Failed to update product'
     });
   }
 });
@@ -570,21 +570,21 @@ async function initDB() {
 
     // Add is_special column if it doesn't exist
     await new Promise((resolve, reject) => {
-        db.run(`
+      db.run(`
             ALTER TABLE products ADD COLUMN is_special BOOLEAN DEFAULT FALSE
         `, (err) => {
-            // Ignore "duplicate column" errors
-            if (err && !err.message.includes('duplicate column')) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
+        // Ignore "duplicate column" errors
+        if (err && !err.message.includes('duplicate column')) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
     });
 
     // Mark some products as special offers
     await new Promise((resolve, reject) => {
-        db.run(`
+      db.run(`
             UPDATE products SET is_special = TRUE 
             WHERE name IN ('Trading Card Booster', 'Premium Mug', 'Limited Edition Hoodie')
         `, (err) => err ? reject(err) : resolve());
@@ -620,8 +620,8 @@ async function initDB() {
 
     if (rowCount === 0) {
       console.log('Seeding initial data...');
-        await new Promise((resolve, reject) => {
-          db.run(`
+      await new Promise((resolve, reject) => {
+        db.run(`
             INSERT INTO products (name, price, category, image, description, is_special) VALUES
             ('Classic T-Shirt', 18.99, 'Apparel', 'tshirt.png', 'Our classic cotton t-shirt with comfortable fit and durable print. Available in multiple colors.', FALSE),
             ('Hoodie', 34.99, 'Apparel', 'Hoodie.png', 'Warm and cozy hoodie with kangaroo pocket and adjustable drawstrings. Perfect for chilly days.', FALSE),
@@ -651,11 +651,11 @@ async function startServer() {
   try {
     console.log('Starting server initialization...');
     await initDB();
-    
+
     // Simple port selection with fallback
     const startServer = () => {
       const portsToTry = [50000, 50001, 50002, 50003, 50004];
-      
+
       const tryPort = (portIndex) => {
         if (portIndex >= portsToTry.length) {
           console.error('Could not find available port');
@@ -702,7 +702,7 @@ async function startServer() {
     });
 
     process.stdin.resume();
-    
+
   } catch (error) {
     console.error('Server startup failed:', error);
     process.exit(1);
