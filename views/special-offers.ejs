@@ -133,7 +133,6 @@
                     const result = await response.json();
                     if (result.success) {
                         updateCartCount(result.count);
-                        alert('Item added to cart!');
                     }
                 } catch (error) {
                     console.error('Error:', error);
