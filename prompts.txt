@@ -174,4 +174,44 @@ The remove button on the cart page does not work.
 3. "its still happening. What I mean is when you click add to cart on the store page dont open up the info page for the item. Only open up the info page for an item if you click on the name or picture of an item"
 4. "the cart amount is still saying 0 when on the home page and customer service page after I add an item to the cart"
 5. "can you remove the item added to cart alert when adding an item to your cart on the special offers page"
-6. "add these prompts to prompts.txt under the void/deepseek heading"
+
+Something went wrong
+
+C:\Users\Evan\Documents\Prototype\views\admin-login.ejs:4 2| 3| >> 4| 5| 
+
+I got this error when I tried to sign in to the admin console with a wrong password.
+
+Error: ReferenceError: C:\Users\Evan\Documents\Prototype\views\admin-login.ejs:4
+    2| <html>
+    3| <head>
+ >> 4|   <title><%= title %></title>
+    5|   <style>
+    6|     body { font-family: Arial, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; }
+    7|     .error { color: red; margin-bottom: 15px; }
+
+title is not defined
+
+I get this when I log out: Debug: No error message was provided
+
+How is the admin password being stored currently?
+
+1. "On the special offers page, how is the crossed out price being calculated?"
+
+[{
+	"resource": "/c:/Users/Evan/Documents/Prototype/views/admin-products.ejs",
+	"owner": "_generated_diagnostic_collection_name_#1",
+	"code": "css-propertyvalueexpected",
+	"severity": 8,
+	"message": "property value expected",
+	"source": "css",
+	"startLineNumber": 81,
+	"startColumn": 70,
+	"endLineNumber": 81,
+	"endColumn": 71
+}]
+
+I'm getting this syntax error.,
+
+- Can you make it so that the special offer status can be managed in the admin dashboard?
+
+- admin-products.ejs has a syntax error
