@@ -1,10 +1,11 @@
-# eCommerce Prototype
+# eCommerce Project
 
-A frontend prototype for an eCommerce application built with:
+An eCommerce application built with:
 - Node.js
 - Express
 - Bootstrap 5
 - EJS templates
+- SQLite
 
 ## Setup Instructions
 
@@ -26,4 +27,3 @@ npm start
 
 ## Available Scripts
 - `npm start` - Starts the development server
-- `npm test` - (TODO) Run tests
