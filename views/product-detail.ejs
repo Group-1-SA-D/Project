@@ -45,6 +45,14 @@
                 <p class="text-muted mb-3"><%= product.category %></p>
                 <h3 class="mb-4">$<%= product.price.toFixed(2) %></h3>
                 <p class="mb-4"><%= product.description || 'No description available' %></p>
+
+                <% if (product.needs_customization) { %>
+                <div class="form-group mb-4">
+                    <label for="customText">Customization Details</label>
+                    <textarea id="customText" class="form-control" placeholder="Enter your customization instructions..." rows="3"></textarea>
+                </div>
+                <% } %>
+
                 <div class="d-flex gap-3">
                     <button class="btn btn-primary btn-lg add-to-cart" data-id="<%= product.id %>">
                         <i class="bi bi-cart-plus"></i> Add to Cart
@@ -79,12 +87,16 @@
             e.preventDefault();
             const productId = this.dataset.id;
             try {
-                const response = await fetch('/api/cart/add', {
+                const customText = document.getElementById('customText')?.value;
+const response = await fetch('/api/cart/add', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ productId })
+                    body: JSON.stringify({ 
+                        productId,
+                        customText
+                    })
                 });
                 const result = await response.json();
                 if (result.success) {

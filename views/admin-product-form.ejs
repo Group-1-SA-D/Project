@@ -140,6 +140,14 @@
         </label>
       </div>
 
+      <div class="form-group">
+        <label>
+          <input type="checkbox" name="needs_customization" <%= product && product.needs_customization ? 'checked' : '' %>>
+          Requires Customization
+        </label>
+        <small class="text-muted">When checked, customers will be prompted for custom text</small>
+      </div>
+
       <div style="margin-top: 20px;">
         <button type="submit">Save Product</button>
         <a href="/admin/products" style="margin-left: 10px; color: #333; text-decoration: none;">Cancel</a>

@@ -117,7 +117,8 @@ app.post('/api/cart/add', async (req, res) => {
         name: product.name,
         price: product.price,
         image: product.image,
-        quantity: 1
+        quantity: 1,
+        customization: req.body.customText || null
       });
     }
 
@@ -596,6 +597,19 @@ async function initDB() {
         ALTER TABLE products ADD COLUMN description TEXT DEFAULT ''
       `, (err) => {
         // Ignore "duplicate column" errors
+        if (err && !err.message.includes('duplicate column')) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // Add needs_customization column if it doesn't exist
+    await new Promise((resolve, reject) => {
+      db.run(`
+        ALTER TABLE products ADD COLUMN needs_customization BOOLEAN DEFAULT FALSE
+      `, (err) => {
         if (err && !err.message.includes('duplicate column')) {
           reject(err);
         } else {
